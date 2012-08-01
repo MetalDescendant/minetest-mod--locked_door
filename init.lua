@@ -93,6 +93,11 @@ local function doorDig (pos, node, digger)
     minetest.node_dig(pos,node,digger)
 end
 
+local function doorDigCheck(pos, player)
+    local owner = minetest.env:get_meta(pos):get_string("owner")
+    return owner == player.name
+end
+
 local lockedDoorProperties = {
     description = "locked door",
     tiles = {"locked_door_bottom.png"},
@@ -108,6 +113,7 @@ local lockedDoorProperties = {
     drawtype = "signlike",
     on_punch = doorOpen,
     on_dig = doorDig,
+    can_dig = doorDigCheck,
     after_place_node = doorInit}
 
 local unlockedDoorProperties = {}
