@@ -4,53 +4,46 @@ local function doorOpen(pos,node, hitter)
     local name = meta:get_string("owner")
     local open = meta:get_int("open")
     local close = meta:get_int("close")
+    local otherHalf
+    local otherHalfNode
+    local doorState
     if hitter:get_player_name() == name then
+        if string.find(node.name, "open") then
+            doorState = close
+        else
+            doorState = open
+        end
         if string.find(node.name,"Top") then
-            local below = {x = pos.x, y = pos.y-1, z = pos.z}
-            local belowNode = minetest.env:get_node(below)
+            otherHalf= {x = pos.x, y = pos.y-1, z = pos.z}
             if node.name == "locked_door:lockedDoorTop" then
-                minetest.env:set_node(pos,{name="locked_door:openDoorTop", param1=node.param1, param2 = open})
-                if string.find(belowNode.name,"locked_door") then
-                    minetest.env:set_node(below,{name="locked_door:openDoor", param1=belowNode.param1, param2 = open})
-                end
+                newName = "locked_door:openDoorTop"
+                otherNewName = "locked_door:openDoor"
             elseif node.name == "locked_door:openDoorTop" then
-                minetest.env:set_node(pos,{name="locked_door:lockedDoorTop", param1=node.param1, param2 = close})
-                if string.find(belowNode.name,"locked_door") then
-                    minetest.env:set_node(below,{name="locked_door:lockedDoor", param1=belowNode.param1, param2 = close})
-                end
-            end
-            meta:set_string("owner",name)
-            meta:set_int("open",open)
-            meta:set_int("close",close)
-            if string.find(belowNode.name,"locked_door") then
-                meta = minetest.env:get_meta(below)
-                meta:set_string("owner",name)
-                meta:set_int("open",open)
-                meta:set_int("close",close)
+                newName = "locked_door:lockedDoorTop"
+                otherNewName = "locked_door:lockedDoor"
             end
         else
-            local above = {x = pos.x, y = pos.y+1, z = pos.z}
-            local aboveNode = minetest.env:get_node(above)
+            otherHalf = {x = pos.x, y = pos.y+1, z = pos.z}
             if node.name == "locked_door:lockedDoor" then
-                minetest.env:set_node(pos,{name="locked_door:openDoor", param1=node.param1, param2 = open})
-                if string.find(aboveNode.name,"locked_door") then
-                    minetest.env:set_node(above,{name="locked_door:openDoorTop", param1=aboveNode.param1, param2 = open})
-                end
+                newName = "locked_door:openDoor"
+                otherNewName = "locked_door:openDoorTop"
             elseif node.name == "locked_door:openDoor" then
-                minetest.env:set_node(pos,{name="locked_door:lockedDoor", param1=node.param1, param2 = close})
-                if string.find(aboveNode.name,"locked_door") then
-                    minetest.env:set_node(above,{name="locked_door:lockedDoorTop", param1=aboveNode.param1, param2 = close})
-                end
+                newName = "locked_door:lockedDoor"
+                otherNewName = "locked_door:lockedDoorTop"
             end
+        end
+        minetest.env:set_node(pos,{name=newName, param1=node.param1, param2 = doorState})
+        otherHalfNode = minetest.env:get_node(otherHalf)
+        minetest.env:set_node(otherHalf,{name=otherNewName, param1=otherHalfNode.param1, param2 = doorState})
+        --reset metadata
+        meta:set_string("owner",name)
+        meta:set_int("open",open)
+        meta:set_int("close",close)
+        if string.find(otherHalfNode.name,"locked_door") then
+            meta = minetest.env:get_meta(otherHalf)
             meta:set_string("owner",name)
             meta:set_int("open",open)
             meta:set_int("close",close)
-            if string.find(aboveNode.name,"locked_door") then
-                meta = minetest.env:get_meta(above)
-                meta:set_string("owner",name)
-                meta:set_int("open",open)
-                meta:set_int("close",close)
-            end
         end
     end
 end
