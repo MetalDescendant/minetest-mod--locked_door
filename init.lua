@@ -100,7 +100,7 @@ local lockedDoorProperties = {
     sunlight_propagates = true, 
     paramtype="light",
     paramtype2 = "wallmounted",
-    groups = {crumbly=3},
+    groups = {immortal=1},
     walkable = true,
     diggable = true,
     climbable = false,
@@ -120,8 +120,11 @@ for key, value in pairs(lockedDoorProperties) do
     lockedDoorTopProperties[key] = value 
     unlockedDoorTopProperties[key] = value 
 end
+
 unlockedDoorProperties.walkable = false
+unlockedDoorProperties.groups = {crumbly=3}
 unlockedDoorTopProperties.walkable = false
+unlockedDoorTopProperties.groups = {crumbly=3}
 lockedDoorTopProperties.tiles = {"locked_door_top.png"}
 lockedDoorTopProperties.drop = ""
 unlockedDoorTopProperties.tiles = {"locked_door_top.png"}
